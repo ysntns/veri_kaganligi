@@ -1,0 +1,114 @@
+turkce_nlp/
+│
+├── .github/
+│   └── workflows/
+│       ├── ci_cd.yml
+│       └── qodana_code_quality.yml
+│
+├── backend/
+│   ├── app/
+│   │   ├── core/
+│   │   │   └── security.py
+│   │   ├── models/
+│   │   │   ├── __init__.py
+│   │   │   ├── keyword_extractor.py
+│   │   │   ├── question_answerer.py
+│   │   │   ├── sentiment_analyzer.py
+│   │   │   ├── summarizer.py
+│   │   │   ├── text_classifier.py
+│   │   │   └── translator.py
+│   │   └── services/
+│   │       ├── __init__.py
+│   │       └── pdf_service.py
+│   ├── tests/
+│   │   └── __init__.py
+│   ├── main.py
+│   ├── models.py
+│   ├── security.py
+│   └── services.py
+│
+├── data/
+│   ├── static/
+│   │   ├── arkaplan.mp4
+│   │   └── arkaplan.jpg
+│   ├── HepsiBurada.csv
+│   ├── HepsiBurada_cleaned.csv
+│   ├── dataset.json
+│   └── örnek_metin.txt
+│
+├── frontend/
+│   ├── build/
+│   │   ├── static/
+│   │   │   └── js/
+│   │   │       ├── main.99994348.js
+│   │   │       ├── main.99994348.js.map
+│   │   │       └── main.99994348.js.LICENSE.txt
+│   │   ├── index.html
+│   │   ├── asset-manifest.json
+│   │   ├── background.mp4
+│   │   └── favicon.ico
+│   ├── config/
+│   │   ├── jest/
+│   │   │   ├── babelTransform.js
+│   │   │   ├── cssTransform.js
+│   │   │   └── fileTransform.js
+│   │   ├── webpack/
+│   │   │   ├── persistentCache/
+│   │   │   │   └── createEnvironmentHash.js
+│   │   │   ├── env.js
+│   │   │   ├── getHttpsConfig.js
+│   │   │   ├── modules.js
+│   │   │   ├── paths.js
+│   │   │   ├── webpack.config.js
+│   │   │   └── webpackDevServer.config.js
+│   ├── public/
+│   │   ├── index.html
+│   │   ├── background.mp4
+│   │   └── favicon.ico
+│   ├── scripts/
+│   │   ├── build.js
+│   │   ├── start.js
+│   │   └── test.js
+│   └── src/
+│       ├── components/
+│       ├── pages/
+│       ├── styles/
+│       ├── utils/
+│       ├── App.css
+│       ├── index.css
+│       ├── styles.css
+│       ├── App.js
+│       ├── index.js
+│       └── PdfUpload.js
+│
+├── logging/
+│   └── logstash.conf
+│
+├── scripts/
+│   └── fine_tune_bart.py
+│
+├── tests/
+│   ├── test.pdf
+│   ├── test_with_table.pdf
+│   ├── __init__.py
+│   ├── test-pdf-service.py
+│   ├── test_api.py
+│   └── test_models.py
+│
+├── .env
+├── .env.backup
+├── .gitignore
+├── demo.mp4
+├── favicon.ico
+├── install_requirements.py
+├── list_project_structure.py
+├── package.json
+├── package.json.backup
+├── pdf-processor.py
+├── pdfplumber==0.5.3
+├── project-structure.txt
+├── project_structure.txt
+├── README.md
+├── requirements.txt
+├── tabula==3.7.4
+└── yarn.lock

@@ -1,0 +1,15 @@
+[
+  {
+    "text": "X marka telefonun kamerası harika ama bataryası çok çabuk bitiyor.",
+    "entities": [
+      {"name": "X", "type": "BRAND"},
+      {"name": "kamera", "type": "FEATURE"},
+      {"name": "batarya", "type": "FEATURE"}
+    ],
+    "sentiments": [
+      {"entity": "X", "sentiment": "neutral"},
+      {"entity": "kamera", "sentiment": "positive"},
+      {"entity": "batarya", "sentiment": "negative"}
+    ]
+  }
+]

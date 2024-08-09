@@ -1,0 +1,101 @@
+name: CI/CD
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.11'
+
+      - name: Cache dependencies
+        uses: actions/cache@v2
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r app/requirements.txt
+
+      - name: Run tests
+        run: pytest app/tests
+
+  build-and-push:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Build and push Docker images
+        env:
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+        run: |
+          docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+          docker-compose build
+          docker-compose push
+
+  deploy:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to production
+        env:
+          DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+        run: |
+          mkdir -p ~/.ssh
+          echo "$DEPLOY_SSH_KEY" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh user@your-server 'cd /path/to/project && docker-compose pull && docker-compose up -d'
+
+
+
+
+#Açıklamalar ve Geliştirmeler:
+#name: CI/CD:
+#
+#Bu, iş akışının genel adını belirler. Bu isim, GitHub Actions arayüzünde görünecek.
+#on::
+#
+#push:: main dalına yapılan push işlemleri bu iş akışını tetikler.
+#pull_request:: main dalına yapılan pull request işlemleri bu iş akışını tetikler.
+#jobs::
+#
+#test:: Test iş akışı. Bu iş akışı, kodu checkout eder, Python'u kurar, bağımlılıkları yükler ve testleri çalıştırır.
+#steps::
+#actions/checkout@v2: Kodu repository'den checkout eder.
+#actions/setup-python@v2: Belirtilen Python sürümünü kurar.
+#Install dependencies: Pip kullanarak bağımlılıkları yükler.
+#Run tests: pytest kullanarak testleri çalıştırır.
+#build-and-push:: Docker image'larını oluşturma ve Docker Hub'a push etme iş akışı.
+#needs: test: Bu iş akışı, test iş akışının başarılı bir şekilde tamamlanmasını bekler.
+#steps::
+#actions/checkout@v2: Kodu repository'den checkout eder.
+#Build and push Docker images: Docker image'larını oluşturur ve Docker Hub'a push eder. Kullanıcı adı ve şifre için GitHub Secrets kullanılır.
+#deploy:: Uygulamayı production ortamına dağıtma iş akışı.
+#needs: build-and-push: Bu iş akışı, build-and-push iş akışının başarılı bir şekilde tamamlanmasını bekler.
+#steps::
+#Deploy to production: SSH kullanarak production sunucusuna bağlanır ve Docker Compose ile uygulamayı dağıtır. SSH anahtarı için GitHub Secrets kullanılır.
+#İyileştirme ve Ekstra Güvenlik Önlemleri:
+#Bağımlılıkların Önbelleğe Alınması:
+#
+#Bağımlılıkların yüklenme süresini azaltmak için bağımlılıkları önbelleğe alabiliriz.
+#Daha Detaylı Test Aşamaları:
+#
+#Kodunuzu sadece pytest ile değil, diğer kalite kontrol araçlarıyla da test edebilirsiniz (örneğin flake8, mypy).
+#Otomatik Sürüm Yükseltme ve Notifikasyonlar:
+#
+#Dağıtım işleminden sonra otomatik olarak sürüm numarası yükseltme ve notifikasyonlar ekleyebilirsiniz.

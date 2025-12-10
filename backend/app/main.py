@@ -1,85 +1,127 @@
-from fastapi import FastAPI, File, UploadFile, HTTPException
+"""
+Veri Kaganligi - Turkce NLP API
+Teknofest 2024 NLP Yarismasi Finalist Projesi
+
+Ana FastAPI uygulamasi
+"""
+import logging
+from contextlib import asynccontextmanager
+
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.openapi.docs import get_swagger_ui_html
+from fastapi.responses import RedirectResponse
 
-from services import pdf_service
-from models import summarizer, translator, sentiment_analyzer, keyword_extractor, text_classifier, question_answerer
+from .config import get_settings
+from .api import router
 
-app = FastAPI()
+# Logging ayarlari
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
 
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Uygulama yasam dongusu"""
+    logger.info("Veri Kaganligi API baslatiliyor...")
+    yield
+    logger.info("Veri Kaganligi API kapatiliyor...")
+
+
+# FastAPI uygulamasi
+settings = get_settings()
+
+app = FastAPI(
+    title=settings.APP_NAME,
+    version=settings.APP_VERSION,
+    description="""
+    ## Turkce Dogal Dil Isleme API'si
+
+    Bu API, Turkce metinler uzerinde cesitli NLP islemlerini gerceklestirmek icin tasarlanmistir.
+
+    ### Ozellikler:
+    - **Metin Ozetleme**: Uzun metinleri otomatik ozetler
+    - **Duygu Analizi**: Metinlerin duygusal tonunu analiz eder
+    - **Metin Siniflandirma**: Metinleri kategorilere ayirir
+    - **Soru-Cevap**: Baglam icerisinde sorulari cevaplar
+    - **Anahtar Kelime Cikarma**: Onemli kelimeleri tespit eder
+    - **Varlik Tanima (NER)**: Kisi, yer ve organizasyonlari bulur
+    - **Ceviri**: Turkce'den diger dillere ve tersine ceviri
+    - **PDF Isleme**: PDF'lerden metin ve tablo cikarma
+
+    ### Teknofest 2024 NLP Yarismasi Finalist Projesi
+    """,
+    docs_url="/docs",
+    redoc_url="/redoc",
+    lifespan=lifespan
+)
+
+# CORS ayarlari
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=settings.CORS_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-@app.get("/")
-def read_root():
-    return {"Hello": "World"}
-
-@app.get("/docs", include_in_schema=False)
-async def custom_swagger_ui_html():
-    return get_swagger_ui_html(
-        openapi_url="/openapi.json",
-        title="API Docs",
-        oauth2_redirect_url=None,
-        swagger_js_url="https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/3.37.2/swagger-ui-bundle.js",
-        swagger_css_url="https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/3.37.2/swagger-ui.css",
-    )
+# API router'ini ekle
+app.include_router(router, prefix="/api/v1")
 
 
-@app.post("/upload-pdf/")
-async def upload_pdf(file: UploadFile = File(...)):
-    try:
-        content = await file.read()
-        return pdf_service.extract_text_and_tables(content)
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+@app.get("/", include_in_schema=False)
+async def root():
+    """Ana sayfa - API dokumantasyonuna yonlendir"""
+    return RedirectResponse(url="/docs")
 
-@app.post("/summarize/")
-async def summarize(text: str):
-    try:
-        return {"summary": summarizer.summarize(text)}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
 
-@app.post("/translate/")
-async def translate(text: str, target_language: str):
-    try:
-        return {"translated": translator.translate(text, target_language)}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+@app.get("/health", tags=["Sistem"])
+async def health_check():
+    """Sistem saglik kontrolu"""
+    return {
+        "status": "healthy",
+        "version": settings.APP_VERSION,
+        "service": settings.APP_NAME
+    }
 
-@app.post("/analyze-sentiment/")
-async def analyze_sentiment(text: str):
-    try:
-        return {"sentiment": sentiment_analyzer.analyze(text)}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
 
-@app.post("/extract-keywords/")
-async def extract_keywords(text: str):
-    try:
-        return {"keywords": keyword_extractor.extract(text)}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+@app.get("/api/v1", tags=["Sistem"])
+async def api_info():
+    """API bilgileri"""
+    return {
+        "name": settings.APP_NAME,
+        "version": settings.APP_VERSION,
+        "endpoints": {
+            "nlp": [
+                "/api/v1/summarize",
+                "/api/v1/analyze-sentiment",
+                "/api/v1/analyze-entity-sentiment",
+                "/api/v1/extract-keywords",
+                "/api/v1/classify-text",
+                "/api/v1/recognize-entities",
+                "/api/v1/answer-question"
+            ],
+            "translation": [
+                "/api/v1/translate",
+                "/api/v1/translate-multiple",
+                "/api/v1/detect-language",
+                "/api/v1/supported-languages"
+            ],
+            "file_processing": [
+                "/api/v1/upload-pdf",
+                "/api/v1/upload-file"
+            ]
+        }
+    }
 
-@app.post("/classify-text/")
-async def classify_text(text: str):
-    try:
-        return {"classification": text_classifier.classify(text)}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
-@app.post("/answer-question/")
-async def answer_question(context: str, question: str):
-    try:
-        return {"answer": question_answerer.answer(context, question)}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(
+        "app.main:app",
+        host=settings.HOST,
+        port=settings.PORT,
+        reload=settings.DEBUG
+    )

@@ -1,0 +1,23 @@
+{
+  "name": "Veri Kaganligi - Turkce NLP",
+  "image": "mcr.microsoft.com/devcontainers/python:3.11",
+
+  "features": {
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "18"
+    }
+  },
+
+  "postCreateCommand": "cd backend && pip install -r requirements.txt && python -c \"import nltk; nltk.download('punkt'); nltk.download('stopwords')\" && cd ../frontend && npm install",
+
+  "forwardPorts": [3000, 8000],
+
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-python.python",
+        "dbaeumer.vscode-eslint"
+      ]
+    }
+  }
+}

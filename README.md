@@ -1,115 +1,151 @@
-# Türkçe Doğal Dil İşleme Projesi
+# Veri Kaganligi - Turkce NLP Platformu
 
-Bu proje, Türkçe metinler üzerinde çeşitli doğal dil işleme görevlerini gerçekleştirmek için tasarlanmış kapsamlı bir uygulamadır. Projenin amacı, Türkçe dili için güçlü ve kullanımı kolay NLP araçları sunmaktır.
+> **Teknofest 2024 Turkce Dogal Dil Isleme Yarismasi Finalist Projesi**
 
-## Özellikler
+Turkce metinler uzerinde kapsamli dogal dil isleme (NLP) islemleri gerceklestiren modern bir web uygulamasi.
 
-1. **Anahtar Kelime Çıkarma**: Metinlerden önemli anahtar kelimeleri otomatik olarak çıkarır.
-2. **Soru Cevaplama**: Verilen bir metin ve soru üzerinden otomatik cevap üretir.
-3. **Duygu Analizi**: Metinlerin duygusal tonunu analiz eder (olumlu, olumsuz, nötr).
-4. **Metin Özetleme**: Uzun metinleri daha kısa ve öz hale getirir.
-5. **Metin Sınıflandırma**: Metinleri önceden belirlenmiş kategorilere ayırır.
-6. **Çeviri**: Türkçe metinleri diğer dillere çevirir veya diğer dillerden Türkçe'ye çevirir.
-7. **PDF İşleme**: PDF dosyalarından metin çıkarma ve analiz etme.
+## Ozellikler
+
+| Ozellik | Aciklama | Model |
+|---------|----------|-------|
+| **Metin Ozetleme** | Uzun metinleri otomatik ozetler | mT5-Turkish |
+| **Duygu Analizi** | Pozitif/Negatif/Notr siniflandirma | BERT-Turkish-Sentiment |
+| **Metin Siniflandirma** | Kategori tahmini (ekonomi, spor, politika, teknoloji) | BERT-Turkish-Classification |
+| **Soru-Cevap** | Baglam icinde soru cevaplama | BERT-Turkish-SQuAD |
+| **Anahtar Kelime** | TF-IDF, TextRank tabanli cikarma | Custom |
+| **Varlik Tanima (NER)** | Kisi, yer, organizasyon tespiti | BERT-Turkish-NER |
+| **Ceviri** | 15+ dil destegi | Helsinki-NLP/OPUS |
+| **PDF Isleme** | Metin ve tablo cikarma, OCR destegi | PyMuPDF + pdfplumber |
+
+## Proje Yapisi
+
+```
+veri_kaganligi/
+├── backend/
+│   ├── app/
+│   │   ├── api/           # API endpoint'leri
+│   │   ├── models/        # NLP modelleri
+│   │   ├── services/      # PDF ve dosya servisleri
+│   │   ├── config.py      # Konfigürasyon
+│   │   └── main.py        # FastAPI uygulamasi
+│   └── requirements.txt
+├── frontend/
+│   ├── src/
+│   │   ├── components/    # React componentleri
+│   │   ├── utils/         # API fonksiyonlari
+│   │   └── styles/        # CSS/Styled Components
+│   └── package.json
+├── data/                  # Ornek veriler
+└── tests/                 # Test dosyalari
+```
 
 ## Kurulum
 
-1. Repo'yu klonlayın:
-   ```
-   git clone https://github.com/your-username/turkce-nlp.git
-   ```
-
-2. Gerekli paketleri yükleyin:
-   ```
-   pip install -r requirements.txt
-   ```
-
-3. Gerekli ortam değişkenlerini ayarlayın (`.env` dosyasını kullanın).
-
-4. Uygulamayı başlatın:
-   ```
-   python main.py
-   ```
-   ya da
-      ```
-   uvicorn main:app --reload
-   ```
-
-## Kullanım
-
 ### Backend
 
-Backend servisi, Flask kullanılarak oluşturulmuştur. API endpoint'leri şunlardır:
+```bash
+# Sanal ortam olustur
+python -m venv venv
+source venv/bin/activate  # Windows: venv\Scripts\activate
 
-- `/extract-keywords`: Anahtar kelime çıkarma
-- `/answer-question`: Soru cevaplama
-- `/analyze-sentiment`: Duygu analizi
-- `/summarize`: Metin özetleme
-- `/classify`: Metin sınıflandırma
-- `/translate`: Çeviri
-- `/process-pdf`: PDF işleme
+# Bagimliliklari yukle
+cd backend
+pip install -r requirements.txt
 
-Backend için gerekli Python paketlerini yükleyin:
-   ```
-   cd backend
-   pip install -r requirements.txt
-   ```
-
-Her endpoint için POST isteği yapılmalı ve gerekli parametreler JSON formatında gönderilmelidir.
+# Uygulamayi baslat
+uvicorn app.main:app --reload --port 8000
+```
 
 ### Frontend
 
-Frontend, React kullanılarak geliştirilmiştir. Kullanıcı dostu bir arayüz ile tüm NLP işlemlerini gerçekleştirebilirsiniz.
+```bash
+cd frontend
 
-1. Frontend klasörüne gidin:
-   ```
-   cd frontend
-   ```
+# Bagimliliklari yukle
+yarn install  # veya npm install
 
-2. Bağımlılıkları yükleyin:
-   ```
-   yarn install
-   ```
-
-3. Uygulamayı başlatın:
-   ```
-   yarn start
-   ```
-
-## Testler
-
-Testleri çalıştırmak için:
-
-```
-python -m pytest tests/
+# Uygulamayi baslat
+yarn start    # veya npm start
 ```
 
-## Katkıda Bulunma
+## API Kullanimi
 
-# Katkıda Bulunanlar
+API dokumantasyonuna `http://localhost:8000/docs` adresinden erisebilirsiniz.
 
-Bu projede emeği geçen herkese teşekkür ederiz. Aşağıda projeye katkıda bulunan kişilerin listesi yer almaktadır:
+### Ornek Istekler
 
-| İsim | Rol |
-| -- | --- |
-| [Yasin Tanış](https://github.com/ysntns) | Ana Geliştirici |
-|[Yasin Tanış](https://github.com/ysntns)  | Backend Geliştirici |
-| [Yasin Tanış](https://github.com/ysntns) | Frontend Geliştirici |
-|[Yasin Tanış](https://github.com/ysntns)  | NLP Modelleri Geliştirici |
-|  [Yasin Tanış](https://github.com/ysntns)| Veri Bilimci |
-|[Yasin Tanış](https://github.com/ysntns)  | Dokümantasyon ve Test |
+**Metin Ozetleme:**
+```bash
+curl -X POST "http://localhost:8000/api/v1/summarize" \
+  -H "Content-Type: application/json" \
+  -d '{"text": "Ozetlenecek uzun metin...", "max_length": 150}'
+```
 
+**Duygu Analizi:**
+```bash
+curl -X POST "http://localhost:8000/api/v1/analyze-sentiment" \
+  -H "Content-Type: application/json" \
+  -d '{"text": "Bu urun cok guzel!"}'
+```
 
-## Nasıl Katkıda Bulunabilirsiniz?
+**Soru-Cevap:**
+```bash
+curl -X POST "http://localhost:8000/api/v1/answer-question" \
+  -H "Content-Type: application/json" \
+  -d '{"context": "Ankara Turkiyenin baskentidir.", "question": "Turkiyenin baskenti neresidir?"}'
+```
 
-1. Bu repo'yu fork edin.
-2. Yeni bir branch oluşturun (`git checkout -b feature/AmazingFeature`).
-3. Değişikliklerinizi commit edin (`git commit -m 'Add some AmazingFeature'`).
-4. Branch'inizi push edin (`git push origin feature/AmazingFeature`).
-5. Bir Pull Request oluşturun.
+## API Endpoint'leri
 
-Lütfen katkıda bulunmadan önce `CONTRIBUTING.md` dosyasını okuyunuz.
+### NLP
+- `POST /api/v1/summarize` - Metin ozetleme
+- `POST /api/v1/analyze-sentiment` - Duygu analizi
+- `POST /api/v1/analyze-entity-sentiment` - Varlik bazli duygu analizi
+- `POST /api/v1/extract-keywords` - Anahtar kelime cikarma
+- `POST /api/v1/classify-text` - Metin siniflandirma
+- `POST /api/v1/recognize-entities` - Varlik tanima (NER)
+- `POST /api/v1/answer-question` - Soru-cevap
+
+### Ceviri
+- `POST /api/v1/translate` - Tekli ceviri
+- `POST /api/v1/translate-multiple` - Coklu dil cevirisi
+- `POST /api/v1/detect-language` - Dil tespiti
+- `GET /api/v1/supported-languages` - Desteklenen diller
+
+### Dosya Isleme
+- `POST /api/v1/upload-pdf` - PDF yukleme ve isleme
+- `POST /api/v1/upload-file` - Genel dosya yukleme (PDF, CSV, Excel, Word)
+
+## Teknolojiler
+
+### Backend
+- **FastAPI** - Modern, yuksek performansli web framework
+- **Transformers** - HuggingFace NLP modelleri
+- **PyTorch** - Derin ogrenme kutuphanesi
+- **PyMuPDF & pdfplumber** - PDF isleme
+
+### Frontend
+- **React 18** - UI kutuphanesi
+- **Material-UI** - Component kutuphanesi
+- **Styled Components** - CSS-in-JS
+- **Axios** - HTTP istemcisi
+
+### NLP Modelleri
+- `savasy/bert-base-turkish-sentiment-cased`
+- `savasy/bert-turkish-text-classification`
+- `savasy/bert-base-turkish-squad`
+- `savasy/bert-base-turkish-ner-cased`
+- `ozcangundes/mt5-small-turkish-summarization`
+- `Helsinki-NLP/opus-mt-*`
+
+## Gelistirici
+
+**Yasin Tanis** - [@ysntns](https://github.com/ysntns)
 
 ## Lisans
 
-Bu proje   Apache License  altında lisanslanmıştır. Detaylar için `LICENSE` dosyasına bakınız.# veri_kaganligi
+Bu proje Apache License 2.0 altinda lisanslanmistir. Detaylar icin [LICENSE](LICENSE) dosyasina bakiniz.
+
+---
+
+*Teknofest 2024 Turkce Dogal Dil Isleme Yarismasi icin gelistirilmistir.*
